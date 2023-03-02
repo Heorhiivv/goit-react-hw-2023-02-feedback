@@ -1,25 +1,57 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react'
+import './App.css'
+import { Statistics } from './components/Statistics/Statistics'
+import { Section } from './components/Section/Section'
+import { FeedbackOptions } from './components/FeedbackOptions/FeedbackOptions'
+import { Notification } from './components/Notification/Notification'
+const options = ['good', 'neutral', 'bad']
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  state = {
+    good: 0,
+    neutral: 0,
+    bad: 0
+  }
+  onLeaveFeedback = (name) => {
+    this.setState((prevState) => ({
+      [name]: prevState[name] + 1
+    }))
+    console.log(this.state)
+  }
+  countTotalFeedback = () => {
+    const { good, neutral, bad } = this.state
+    return good + neutral + bad
+  }
+  countPositiveFeedbackPercentage = () => {
+    return this.state.good > 0
+      ? (this.state.good / this.countTotalFeedback()) * 100
+      : 0
+  }
+  render() {
+    const { good, neutral, bad } = this.state
+    return (
+      <div>
+        <Section title="Please leave feedback">
+          <FeedbackOptions
+            options={options}
+            onLeaveFeedback={this.onLeaveFeedback}
+          />
+        </Section>
+        <Section title="Statistics">
+          {this.countTotalFeedback() > 0 ? (
+            <Statistics
+              good={good}
+              neutral={neutral}
+              bad={bad}
+              total={this.countTotalFeedback()}
+              positivePercentage={this.countPositiveFeedbackPercentage()}
+            />
+          ) : (
+            <Notification message="There is no feedback yet..." />
+          )}
+        </Section>
+      </div>
+    )
+  }
 }
-
-export default App;
+export default App
